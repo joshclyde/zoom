@@ -3,19 +3,22 @@
 
 ### Installing
 1. Download `zoom.sh`
-    ```
+
+    ```git
     git clone https://github.com/joshclyde/zoom.git
     git clone git@github.com:joshclyde/zoom.git
     ```
 2. Insert this `if` statement in your `.bashrc`
-    ```
+
+    ```bash
     if [ -f $PATH_TO_ZOOM_SH ]
     then
         . $PATH_TO_ZOOM_SH
     fi
     ```
 3. Go into `zoom.sh` and edit lines 3 and 5 to point to your lerna repo
-    ```
+
+    ```bash
     # This is the path to where your lerna project is
     LERNA="/path/to/root/of/lerna/repo";
     # This is the path to the packages folder of your lerna project
