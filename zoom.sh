@@ -1,8 +1,17 @@
+#!/usr/bin/env bash
+
 function zoom() {
+  source "/Users/joshclyde/stuff/gitrepos/zoom/zoom_config.sh";
+  # echo $bookmarks
+  # for i in "${bookmarks[@]}"
+  # do
+  #  echo "$i"
+  #  # or do whatever with individual element of the array
+  # done
   # This is the path to where your lerna project is
-  LERNA="/Users/joshclyde/stuff/gitrepos/ez_lerna_helper/lerna_structure";
+  LERNA="/Users/joshclyde/stuff/school/capstone/magazineRepo";
   # This is the path to the packages folder of your lerna project
-  ROOT="/Users/joshclyde/stuff/gitrepos/ez_lerna_helper/lerna_structure/packages";
+  ROOT="/Users/joshclyde/stuff/school/capstone/magazineRepo";
   if [ -z "$1" ]
   then
     echo "🚀  Zooooooming to your lerna repo..."
@@ -13,6 +22,7 @@ function zoom() {
   shopt -s nullglob
   array=($(ls "$ROOT/"))
   shopt -u nullglob # Turn off nullglob to make sure it doesn't interfere with anything later
+
 
   MATCHES=()
   counter=0
