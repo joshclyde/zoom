@@ -20,9 +20,11 @@ function smartCommit() {
     return
   fi
 
-  # grab ticket from branch name
+  # get branch name
   branch="$(git symbolic-ref --short HEAD)"
+  # seperate branch into array delimited by /
   IFS='/'; branchArray=($branch); unset IFS;
+  # get the last element in branchArray
   ticketFound=${branchArray[${#branchArray[@]}-1]}
 
   printf "        You: ${Green}Josh${Color_Off}\n"
