@@ -58,5 +58,5 @@ function smartCommit() {
   fi
 
   echo "git commit -m \"$people | $ticket | $message\""
-  echo `git commit -m "$people | $ticket | $commitMessage"`
+  echo `git commit -m "$people | $ticket | $message"`
 }
