@@ -1,5 +1,18 @@
 #!/usr/bin/env bash
 
+# Reset
+Color_Off='\033[0m'       # Text Reset
+
+# Regular Colors
+Black='\033[0;30m'        # Black
+Red='\033[0;31m'          # Red
+Green='\033[0;32m'        # Green
+Yellow='\033[0;33m'       # Yellow
+Blue='\033[0;34m'         # Blue
+Purple='\033[0;35m'       # Purple
+Cyan='\033[0;36m'         # Cyan
+White='\033[0;37m'        # White
+
 function smartCommit() {
   # TODO: have a helpful man page
   if [ "$1" = "-h" ]; then
@@ -7,21 +20,43 @@ function smartCommit() {
     return
   fi
 
-  # TODO: create an option to set the user's default name so they don't need to enter it every commit
-  # TODO: color current user's name
-  read -p "Partner (in additon to Josh): " partner
-  if [ partner = "" ]; then
+  # grab ticket from branch name
+  branch="$(git symbolic-ref --short HEAD)"
+  IFS='/'; branchArray=($branch); unset IFS;
+  ticketFound=${branchArray[${#branchArray[@]}-1]}
+
+  printf "        You: ${Green}Josh${Color_Off}\n"
+  printf "     Ticket: ${Green}${ticketFound}${Color_Off}\n"
+ 
+  printf "Partner(s)?: ${Yellow}"
+  read partner
+ 
+  printf "${Color_Off}    Ticket?: ${Yellow}"
+  read ticketInput
+
+  printf "${Color_Off}    Message: ${Yellow}"
+  read message
+  printf "${Color_Off}"
+
+  echo ""
+
+  if [ -z "$partner" ]; then
     people="Josh"
   else
-    people="Josh and $partner"
+    people="Josh, $partner"
   fi
-  # TODO: grab ticket from branch name
-  # TODO: color default ticket
-  read -p "Ticket : " ticket
 
-  # TODO: give the user the option to view a git diff if they forgot what changes they made
-  read -p "Message: " commitMessage
+  if [ -z "$ticketInput" ]; then
+    ticket=$ticketFound
+  else
+    ticket=$ticketInput
+  fi
 
-  # should i automatically do the commit, or verify with them that the entire command is written right?
+  if [ -z "$message" ]; then
+    printf "${Red}ERROR${Color_Off}: message is required\n"
+    return
+  fi
+
+  echo "git commit -m \"$people | $ticket | $message\""
   echo `git commit -m "$people | $ticket | $commitMessage"`
 }
