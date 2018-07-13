@@ -16,21 +16,15 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 DIR_CONFIG="${DIR}/config"
 FILE_NAME="${DIR_CONFIG}/name.txt"
 
-# help manual
-if [ "$1" = "-h" ]; then
+helpManual()
+{
   printf "       smartcommit      create and then execute commit\n"
   printf "       smartcommit -h   quick help on smartcommit\n"
   printf "       smartcommit -d   delete current config\n"
-  exit
-fi
+}
 
-# create config dir if it doesn't exist
-if [ ! -d "${DIR_CONFIG}" ]; then
-  mkdir "${DIR_CONFIG}"
-fi
-
-# allow the user to deleted their current configuration options
-if [ "$1" = "-d" ]; then
+deleteConfig()
+{
   printf "Delete current config (y/n): "
   read yesOrNo
   if [ "$yesOrNo" = "y" ]; then
@@ -39,46 +33,70 @@ if [ "$1" = "-d" ]; then
   else
     printf "Nothing happened\n"
   fi
-  exit
-fi
+}
 
-# force user to enter name
-if [ ! -f "${FILE_NAME}" ]; then
+setConfig()
+{
   printf "        You: "
   read nameInput
   echo "${nameInput}" > "${FILE_NAME}"
   printf "\n"
+}
+
+createMessage()
+{
+  # get developer name
+  name=`cat ${FILE_NAME}`
+  # get branch name
+  branch=`git symbolic-ref --short HEAD`
+  # seperate branch into array delimited by /
+  IFS='/'; branchArray=($branch); unset IFS;
+  # get the last element in branchArray
+  branchTicket=${branchArray[${#branchArray[@]}-1]}
+
+  printf "        You: ${name}\n"
+  printf "     Ticket: ${branchTicket}\n"
+
+  printf "Partner(s)?: "
+  read partner
+
+  printf "    Ticket?: "
+  read ticketInput
+
+  printf "    Message: "
+  read message
+  echo ""
+
+  if [ -z "$message" ]; then
+    printf "${Red}ERROR${ColorOff}: message is required\n"
+    exit
+  fi
+
+  people=$([ -z "$partner" ] && echo "${name}" || echo "${name}, $partner")
+  ticket=$([ -z "$ticketInput" ] && echo "$branchTicket" || echo "$ticketInput")
+
+  printf "git commit -m \"$people | $ticket | $message\"\n"
+  echo `git commit -m "$people | $ticket | $message"`
+}
+
+# create config dir if it doesn't exist
+if [ ! -d "${DIR_CONFIG}" ]; then
+  mkdir "${DIR_CONFIG}"
 fi
 
-# get developer name
-name=`cat ${FILE_NAME}`
-# get branch name
-branch=`git symbolic-ref --short HEAD`
-# seperate branch into array delimited by /
-IFS='/'; branchArray=($branch); unset IFS;
-# get the last element in branchArray
-branchTicket=${branchArray[${#branchArray[@]}-1]}
-
-printf "        You: ${name}\n"
-printf "     Ticket: ${branchTicket}\n"
-
-printf "Partner(s)?: "
-read partner
-
-printf "    Ticket?: "
-read ticketInput
-
-printf "    Message: "
-read message
-echo ""
-
-if [ -z "$message" ]; then
-  printf "${Red}ERROR${ColorOff}: message is required\n"
+if [ "$1" = "-h" ]; then
+  helpManual
   exit
 fi
 
-people=$([ -z "$partner" ] && echo "${name}" || echo "${name}, $partner")
-ticket=$([ -z "$ticketInput" ] && echo "$branchTicket" || echo "$ticketInput")
+if [ "$1" = "-d" ]; then
+  deleteConfig
+  exit
+fi
 
-printf "git commit -m \"$people | $ticket | $message\"\n"
-echo `git commit -m "$people | $ticket | $message"`
+# force user to enter name if no config exists
+if [ ! -f "${FILE_NAME}" ]; then
+  setConfig
+fi
+
+createMessage
