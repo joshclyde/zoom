@@ -37,7 +37,7 @@ setConfigRoot()
   else
     printf "\nPlease navigate to your lerna repo to configure zoom\n"
   fi
-  exit
+  return
 }
 
 navigateToRoot() {
@@ -54,7 +54,7 @@ executeZoom()
   # if no args are passed in
   if [ -z "$1" ]; then
     navigateToRoot
-    exit
+    return
   fi
 
   shopt -s nullglob
@@ -76,12 +76,11 @@ executeZoom()
   if [ "$counter" -eq "0" ]
   then
     echo "None of the packages contained '$1' in their name."
-    exit
+    return
   elif [ "$counter" -eq "1" ]
   then
     echo "🚀  Zooooooming to $PROJ..."
-    echo $PACKAGES/$PROJ
-    echo `cd $PACKAGES/$PROJ`
+    cd "$PACKAGES/$PROJ"
   else
     if [ ! -z "$2" ]
     then
@@ -90,7 +89,7 @@ executeZoom()
       echo "$counter packages contain '$1' in their name."
     fi
     echo ""
-    echo "  0 -> exit"
+    echo "  0 -> return"
     counter_2=1
     for i in "${MATCHES[@]}"
     do
@@ -102,18 +101,18 @@ executeZoom()
 
     re='^[0-9]+$'
     if ! [[ $userinput =~ $re ]] ; then
-      exit
+      return
     fi
     if [ "$userinput" -eq "0" ]
     then
-      exit
+      return
     fi
 
     echo ""
     userinput=$((userinput-1))
     if [ -z "${MATCHES[$userinput]}" ]
     then
-      exit
+      return
     fi
     echo "🚀  Zooooooming to ${MATCHES[$userinput]}..."
     cd $PACKAGES/${MATCHES[$userinput]}
@@ -127,12 +126,13 @@ fi
 
 if [ "$1" = "-d" ]; then
   deleteConfig
-  exit
+  return
 fi
 
 # set config if none exists
 if [ ! -f "${FILE_ROOT}" ]; then
   setConfigRoot
+  return
 fi
 
 executeZoom $1 $2
