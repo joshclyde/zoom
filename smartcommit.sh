@@ -13,7 +13,7 @@ White='\033[0;37m'        # White
 
 # absolute path to directory where this file is located
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-DIR_CONFIG="${DIR}/configSmartcommit"
+DIR_CONFIG="${DIR}/config-smartcommit"
 FILE_NAME="${DIR_CONFIG}/name.txt"
 
 helpManual()
