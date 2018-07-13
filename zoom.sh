@@ -1,19 +1,64 @@
 #!/usr/bin/env bash
 
-function zoom() {
-  # This is the path to where your lerna project is
-  LERNA="/Users/joshclyde/stuff/repos";
-  # This is the path to the packages folder of your lerna project
-  ROOT="/Users/joshclyde/stuff/repos";
-  if [ -z "$1" ]
-  then
-    echo "🚀  Zooooooming to your lerna repo..."
-    cd $LERNA
-    return
+# absolute path to directory where this file is located
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR_CONFIG="${DIR}/config-zoom"
+FILE_ROOT="${DIR_CONFIG}/root.txt"
+
+helpManual()
+{
+  printf "       z      navigate to your base lerna repo"
+  printf "       z -h   quick help on zoom\n"
+  printf "       z -d   delete current config\n"
+}
+
+deleteConfig()
+{
+  printf "Delete current config (y/n): "
+  read yesOrNo
+  if [ "$yesOrNo" = "y" ]; then
+    rm -rf "${DIR_CONFIG}"
+    printf "Configs removed\n"
+  else
+    printf "Nothing happened\n"
+  fi
+}
+
+
+setConfigRoot()
+{
+  printf "You have not told zoom where your lerna repo is located.\n"
+  printf "Are you currently in the base directory of your lerna repo? (y/n): "
+  read yesOrNo
+  if [ "$yesOrNo" = "y" ]; then
+    lernaRepo=`pwd`
+    echo "${lernaRepo}" > "${FILE_ROOT}"
+    printf "\nLerna repo set to ${lernaRepo}\n"
+  else
+    printf "\nPlease navigate to your lerna repo to configure zoom\n"
+  fi
+  exit
+}
+
+navigateToRoot() {
+  echo "🚀  Zooooooming to your lerna repo..."
+  cd $ROOT
+}
+
+executeZoom()
+{
+  ROOT=`cat ${FILE_ROOT}`
+  PACKAGES="${ROOT}"
+  echo $PACKAGES
+
+  # if no args are passed in
+  if [ -z "$1" ]; then
+    navigateToRoot
+    exit
   fi
 
   shopt -s nullglob
-  array=($(ls "$ROOT/"))
+  array=($(ls "$PACKAGES/"))
   shopt -u nullglob # Turn off nullglob to make sure it doesn't interfere with anything later
 
   MATCHES=()
@@ -31,11 +76,12 @@ function zoom() {
   if [ "$counter" -eq "0" ]
   then
     echo "None of the packages contained '$1' in their name."
-    return
+    exit
   elif [ "$counter" -eq "1" ]
   then
     echo "🚀  Zooooooming to $PROJ..."
-    cd $ROOT/$PROJ
+    echo $PACKAGES/$PROJ
+    echo `cd $PACKAGES/$PROJ`
   else
     if [ ! -z "$2" ]
     then
@@ -56,20 +102,37 @@ function zoom() {
 
     re='^[0-9]+$'
     if ! [[ $userinput =~ $re ]] ; then
-      return
+      exit
     fi
     if [ "$userinput" -eq "0" ]
     then
-      return
+      exit
     fi
 
     echo ""
     userinput=$((userinput-1))
     if [ -z "${MATCHES[$userinput]}" ]
     then
-      return
+      exit
     fi
     echo "🚀  Zooooooming to ${MATCHES[$userinput]}..."
-    cd $ROOT/${MATCHES[$userinput]}
+    cd $PACKAGES/${MATCHES[$userinput]}
   fi
 }
+
+# create config dir if it doesn't exist
+if [ ! -d "${DIR_CONFIG}" ]; then
+  mkdir "${DIR_CONFIG}"
+fi
+
+if [ "$1" = "-d" ]; then
+  deleteConfig
+  exit
+fi
+
+# set config if none exists
+if [ ! -f "${FILE_ROOT}" ]; then
+  setConfigRoot
+fi
+
+executeZoom $1 $2

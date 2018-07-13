@@ -18,9 +18,9 @@ FILE_NAME="${DIR_CONFIG}/name.txt"
 
 helpManual()
 {
-  printf "       smartcommit      create and then execute commit\n"
-  printf "       smartcommit -h   quick help on smartcommit\n"
-  printf "       smartcommit -d   delete current config\n"
+  printf "       c      create and then execute commit\n"
+  printf "       c -h   quick help on smartcommit\n"
+  printf "       c -d   delete current config\n"
 }
 
 deleteConfig()
